@@ -4,6 +4,9 @@ project(console_rpg C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(console_rpg main.c
-        player.c
+        Player.c
         battle.c
-        utils.c)
+        utils.c
+        utils.h
+        player.h
+        battle.h)
