@@ -1,3 +1,3 @@
-//
-// Created by gudil on 05.11.2025.
-//
+#include "Player.c"
+#include "battle.c"
+#include "utils.c"
