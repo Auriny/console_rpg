@@ -100,11 +100,11 @@ static BattleResult battle(Player *player, Player *enemy) {
 
         step++;
     }
-    return player->hp > 0 ? BATTLE_PLAYER_WIN : BATTLE_PLAYER_DEAD;
+    return player->hp > 0 ? WIN : DEAD;
 }
 
 static void win(Player *player, const Player *enemy) {
-    print("Противник %s пал! Вы победили.", enemy->name);
+    print("Противник %s умэр. Победа!", enemy->name);
     int xp = enemy->xp;
     int gold = enemy->gold;
     player->xp += xp;
@@ -155,7 +155,7 @@ void training(Player **ppPlayer) {
     print("Начинается тренировочный бой: %s (Вы) vs %s (Противник)", player->name, enemy->name);
 
     BattleResult res = battle(player, enemy);
-    if (res == BATTLE_PLAYER_WIN) {
+    if (res == WIN) {
         win(player, enemy);
         freeEnemy(&enemy);
         return;
