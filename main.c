@@ -23,11 +23,7 @@ static void createOrRecreate(Player **pp) {
     char name[MAX_NAME_LEN + 1];
     readStrLtd("Введите имя персонажа (до 32 символов): ", name, MAX_NAME_LEN);
     *pp = createPlayer(name);
-    if (*pp) {
-        print("Персонаж '%s' создан", (*pp)->name);
-    } else {
-        print("Что-то пошло не так");
-    }
+    print("Персонаж '%s' создан", (*pp)->name);
 }
 
 int main(void) {

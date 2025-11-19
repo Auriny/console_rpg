@@ -33,7 +33,7 @@ Player* create(void) {
     e->xp = e->maxHp + e->attack + e->defense;
     e->gold = random(0, e->xp);
 
-    e->dodge = random(3, 8);
+    e->dodge = random(0, 25);
 
     print("Противник %s создан по адресу %p (уровень %d, HP %d, атака %d, защита %d)",
     e->name, e, e->level, e->hp, e->attack, e->defense);
@@ -53,7 +53,7 @@ static int baseDamage(const Player *att, const Player *def) {
     return dmg < 1 ? 1 : dmg;
 }
 
-static int didRoll(int percent) {
+static int roll(int percent) {
     if (percent <= 0) return 0;
     if (percent >= 100) return 1;
     int roll = random(1, 100);
@@ -62,10 +62,10 @@ static int didRoll(int percent) {
 
 static void logatt(const Player *att, const Player *def, int dmg, bool dodged) {
     if (dodged) {
-        print("%s уклоняется от атаки %s!", def->name, att->name);
+        print("  >%s уклоняется от атаки %s!", def->name, att->name);
         return;
     }
-    print("%s бьёт %s на %d урона.", att->name, def->name, dmg);
+    print("  >%s бьёт %s на %d урона.", att->name, def->name, dmg);
 }
 
 static BattleResult battle(Player *player, Player *enemy) {
@@ -73,7 +73,7 @@ static BattleResult battle(Player *player, Player *enemy) {
     while (player->hp > 0 && enemy->hp > 0) {
         print("Ход %d:", step);
 
-        bool dodged = didRoll(enemy->dodge);
+        bool dodged = roll(enemy->dodge);
         int dmg = 0;
         if (!dodged) {
             dmg = baseDamage(player, enemy);
@@ -86,7 +86,7 @@ static BattleResult battle(Player *player, Player *enemy) {
         sleep(TURN_DELAY_MS);
         if (enemy->hp <= 0) break;
 
-        dodged = didRoll(player->dodge);
+        dodged = roll(player->dodge);
         dmg = 0;
         if (!dodged) {
             dmg = baseDamage(enemy, player);

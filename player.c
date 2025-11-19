@@ -20,7 +20,7 @@ Player* createPlayer(const char *name) {
 
     p->maxHp = 100;
     p->hp = p->maxHp;
-    p->attack = 5;
+    p->attack = 15;
     p->defense = 3;
     p->level = 1;
     p->xp = 0;
