@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "player.h"
 #include "battle.h"
+#include "dungeon.h"
 
 static void menu(void) {
     print("[0] Выход");
@@ -13,6 +14,10 @@ static void menu(void) {
     print("[2] Показать информацию о персонаже");
     print("[3] Тренировочный бой");
     print("[4] Освободить память");
+    print("[5] Войти в подземелье");
+    // я бы кнш мог сделать на букву e вход в данж,
+    // но мне бы тогда пришлось переделать всю структуру мейна
+    // а я очень не хочу переделывать всю структуру мейна
 }
 
 static void createOrRecreate(Player **pp) {
@@ -37,6 +42,7 @@ int main(void) {
         size_t choice = readMenuChoice();
 
         switch (choice) {
+            // щас она принимает только инт значения (size_t по факту инт ток побольше)
             case 0:
                 if (playerExists(player)) {
                     print("Чистим память");
@@ -61,6 +67,10 @@ int main(void) {
             case 4:
                 if (!playerExists(player)) print("Персонаж не создан");
                 else freePlayer(&player);
+                break;
+            case 5:
+                if (!playerExists(player)) print("Персонаж не создан");
+                else enter_dungeon(&player); /* NEW */
                 break;
             default:
                 illst();

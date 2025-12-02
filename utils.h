@@ -18,4 +18,6 @@ int random(int min, int max);
 
 void sleep(unsigned int ms);
 
+int readKey(void);
+
 #endif

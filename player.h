@@ -17,6 +17,8 @@ typedef struct Player {
     int gold;
 
     int dodge;
+
+    int bonusAttack;
 } Player;
 
 Player* createPlayer(const char *name);

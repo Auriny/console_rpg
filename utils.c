@@ -6,6 +6,7 @@
 #include <wchar.h>
 #include <time.h>
 #include <windows.h>
+#include <conio.h>
 
 void print(const char *format, ...) {
     char buffer[1024];
@@ -43,13 +44,12 @@ static bool readLine(char *buf, size_t cap) {
 
 size_t readMenuChoice() {
     char line[256];
-    while (true) { //можно кста еще for (;;)
+    while (true) {
         if (!readLine(line, sizeof(line))) {
             print("Ошибка ввода, попробуйте снова.");
             continue;
         }
         if (line[0] == '\0') {
-            print("Пустой ввод, повторите попытку.");
             continue;
         }
         char *endptr = NULL;
@@ -67,16 +67,16 @@ void readStrLtd(const char *prompt, char *buffer, size_t maxLen) {
     for (;;) {
         if (prompt && *prompt) print("%s", prompt);
         if (!readLine(line, sizeof(line))) {
-            print("Ошибка ввода, попробуйте снова.");
+            print("Ошибка ввода, попробуйте снова");
             continue;
         }
         size_t len = strlen(line);
         if (len == 0) {
-            print("Строка не должна быть пустой, повторите ввод.");
+            print("Строка не должна быть пустой, повторите ввод");
             continue;
         }
         if (len > maxLen) {
-            print("Слишком длинно (макс %zu символов). Повторите ввод.", maxLen);
+            print("Слишком длинно (макс %zu символов). Повторите ввод", maxLen);
             continue;
         }
         strcpy(buffer, line);
@@ -89,11 +89,10 @@ int readIntRange(const char *prompt, int min, int max) {
     for (;;) {
         if (prompt && *prompt) print("%s", prompt);
         if (!readLine(line, sizeof(line))) {
-            print("Ошибка ввода, попробуйте снова.");
+            print("Ошибка ввода, попробуйте снова");
             continue;
         }
         if (line[0] == '\0') {
-            print("Пустой ввод, повторите попытку.");
             continue;
         }
         char *p = line;
@@ -104,12 +103,12 @@ int readIntRange(const char *prompt, int min, int max) {
             p++;
         }
         if (!ok) {
-            print("Ожидается целое число, повторите ввод.");
+            print("Ожидается целое число, повторите ввод");
             continue;
         }
         const int v = (int) strtol(line, NULL, 10);
         if (v < min || v > max) {
-            print("Число вне диапазона [%d..%d], попробуйте снова.", min, max);
+            print("Число вне диапазона [%d..%d], попробуйте снова", min, max);
             continue;
         }
         return v;
@@ -128,4 +127,18 @@ int random(int min, int max) {
 
 void sleep(unsigned int ms) {
     Sleep(ms);
+}
+
+int readKey(void) {
+    int ch = _getch(); //эта тема не очень сильно работает, я не разобрался :(
+    // хотел сделать чтобы можно было получать символ с клавиатуры без нажатия на enter
+    //типа реально тыкаешь w и оно идет вперед а не как пошаговое непонятно что
+    //но увы)
+    if (ch == 0 || ch == 0xE0) {
+        int ch2 = _getch();
+        (void)ch2;
+        return 0;
+    }
+    if (ch >= 'a' && ch <= 'z') ch = ch - 'a' + 'A';
+    return ch;
 }

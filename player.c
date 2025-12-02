@@ -28,6 +28,8 @@ Player* createPlayer(const char *name) {
 
     p->dodge = 5;
 
+    p->bonusAttack = 0; /* NEW: инициализация бафа */
+
     print("Структура игрока создана по адресу %p", (void*)p);
     return p;
 }
@@ -54,4 +56,5 @@ void printPlayerInfo(const Player *p) {
     print("  Опыт: %d", p->xp);
     print("  Голда: %d", p->gold);
     print("  Уклонение: %d%%", p->dodge);
+    print("  Бонус: %d", p->bonusAttack);
 }

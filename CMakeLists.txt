@@ -9,4 +9,8 @@ add_executable(console_rpg main.c
         utils.c
         utils.h
         player.h
-        battle.h)
+        battle.h
+        dungeon.h
+        dungeon.c
+        map.h
+        map.c)

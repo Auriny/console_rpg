@@ -15,7 +15,8 @@ static void name(char *out, size_t cap) {
     out[len] = '\0';
 }
 
-Player* create(void) {
+Player* createEnemy(int depth) {
+    if (depth < 1) depth = 1;
     Player *e = malloc(sizeof(Player));
     if (!e) {
         print("Не удалось выделить место под противника, чота с памятью");
@@ -24,11 +25,27 @@ Player* create(void) {
     memset(e, 0, sizeof(*e));
 
     name(e->name, sizeof(e->name));
-    e->level = random(1, 5);
+    e->level = random(1, 5) + (depth - 1); //деф уровень
+
     e->maxHp = random(3, 15);
     e->hp = e->maxHp;
     e->attack = 10 * e->level;
     e->defense = 5 * e->level;
+
+    // множители для уровней
+    const double HP_PER_DEPTH = 0.25;
+    const double ATTACK_PER_DEPTH = 0.20;
+    const double DEF_PER_DEPTH = 0.15;
+
+    e->maxHp = (int)(e->maxHp * (1.0 + HP_PER_DEPTH * (depth - 1)));
+    if (e->maxHp < 1) e->maxHp = 1;
+    e->hp = e->maxHp;
+
+    e->attack = (int)(e->attack * (1.0 + ATTACK_PER_DEPTH * (depth - 1)));
+    if (e->attack < 1) e->attack = 1;
+
+    e->defense = (int)(e->defense * (1.0 + DEF_PER_DEPTH * (depth - 1)));
+    if (e->defense < 0) e->defense = 0;
 
     e->xp = e->maxHp + e->attack + e->defense;
     e->gold = random(0, e->xp);
@@ -36,28 +53,33 @@ Player* create(void) {
     e->dodge = random(0, 25);
 
     print("Противник %s создан по адресу %p (уровень %d, HP %d, атака %d, защита %d)",
-    e->name, e, e->level, e->hp, e->attack, e->defense);
+          e->name, (void*)e, e->level, e->hp, e->attack, e->defense);
     return e;
+}
+
+Player* create(void) {
+    return createEnemy(1);
 }
 
 void freeEnemy(Player **pp) {
     if (!pp || !*pp) return;
     Player *e = *pp;
-    print("Структура противника по адресу %p выгружена", e);
+    print("Структура противника по адресу %p выгружена", (void*)e);
     free(e);
     *pp = NULL;
 }
 
 static int baseDamage(const Player *att, const Player *def) {
     int dmg = att->attack - def->defense / 2;
+    dmg += att->bonusAttack; //сюдын докинули бонус к атаке от костра
     return dmg < 1 ? 1 : dmg;
 }
 
 static int roll(int percent) {
     if (percent <= 0) return 0;
     if (percent >= 100) return 1;
-    int roll = random(1, 100);
-    return roll <= percent;
+    int rollv = random(1, 100);
+    return rollv <= percent;
 }
 
 static void logatt(const Player *att, const Player *def, int dmg, bool dodged) {
@@ -68,8 +90,11 @@ static void logatt(const Player *att, const Player *def, int dmg, bool dodged) {
     print("  >%s бьёт %s на %d урона.", att->name, def->name, dmg);
 }
 
-static BattleResult battle(Player *player, Player *enemy) {
+BattleResult battle(Player *player, Player *enemy) {
     int step = 1;
+    bool playerBonusConsumed = false;
+    bool enemyBonusConsumed = false;
+
     while (player->hp > 0 && enemy->hp > 0) {
         print("Ход %d:", step);
 
@@ -77,13 +102,17 @@ static BattleResult battle(Player *player, Player *enemy) {
         int dmg = 0;
         if (!dodged) {
             dmg = baseDamage(player, enemy);
-            if (dmg < 1) dmg = 1; //без этого куска почему-то крашит
+            if (dmg < 1) dmg = 1;
             enemy->hp -= dmg;
             if (enemy->hp < 0) enemy->hp = 0;
         }
         logatt(player, enemy, dmg, dodged);
         print("%s: %d/%d HP | %s: %d/%d HP", player->name, player->hp, player->maxHp, enemy->name, enemy->hp, enemy->maxHp);
         sleep(TURN_DELAY_MS);
+        if (!playerBonusConsumed && player->bonusAttack != 0) {
+            player->bonusAttack = 0;
+            playerBonusConsumed = true;
+        }
         if (enemy->hp <= 0) break;
 
         dodged = roll(player->dodge);
@@ -97,6 +126,11 @@ static BattleResult battle(Player *player, Player *enemy) {
         logatt(enemy, player, dmg, dodged);
         print("%s: %d/%d HP | %s: %d/%d HP", player->name, player->hp, player->maxHp, enemy->name, enemy->hp, enemy->maxHp);
         sleep(TURN_DELAY_MS);
+
+        if (!enemyBonusConsumed && enemy->bonusAttack != 0) {
+            ((Player*)enemy)->bonusAttack = 0;
+            enemyBonusConsumed = true;
+        }
 
         step++;
     }
