@@ -134,6 +134,8 @@ BattleResult battle(Player *player, Player *enemy) {
 
         step++;
     }
+
+    lvlUp(player);
     return player->hp > 0 ? WIN : DEAD;
 }
 

@@ -28,10 +28,29 @@ Player* createPlayer(const char *name) {
 
     p->dodge = 5;
 
-    p->bonusAttack = 0; /* NEW: инициализация бафа */
+    p->bonusAttack = 0;
 
     print("Структура игрока создана по адресу %p", (void*)p);
     return p;
+}
+
+void lvlUp(Player *p) {
+    int xp = p->xp;
+    int lvl = p->level;
+
+    int atk = p->attack;
+    int hp = p->maxHp;
+    int def = p->defense;
+
+    if ((lvl * 100 * 1.25) > xp) {
+        p->level++;
+
+        p->attack = (int) (atk * 1.25);
+        p->defense = (int) (def * 1.25);
+        p->maxHp += (int) (hp * 1.25);
+
+        print("Лвлап");
+    }
 }
 
 void freePlayer(Player **pp) {

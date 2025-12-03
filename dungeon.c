@@ -71,7 +71,6 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
                 player->xp += xp;
                 player->gold += gold;
                 print("Вы победили: +%d XP, +%d золота.", xp, gold);
-                levelUpCheck(player);
                 map_set(m, x, y, 'X');
                 *heroX = x; *heroY = y;
                 freeEnemy(&enemy);

@@ -26,6 +26,8 @@ void freePlayer(Player **pp);
 
 void printPlayerInfo(const Player *p);
 
+void lvlUp(Player *p);
+
 static inline bool playerExists(const Player *p) {
     return p != NULL;
 }

@@ -70,7 +70,7 @@ int main(void) {
                 break;
             case 5:
                 if (!playerExists(player)) print("Персонаж не создан");
-                else enter_dungeon(&player); /* NEW */
+                else enter_dungeon(&player);
                 break;
             default:
                 illst();
