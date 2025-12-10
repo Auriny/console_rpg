@@ -14,9 +14,7 @@ Player* createPlayer(const char *name) {
     if (name && *name) {
         strncpy(p->name, name, MAX_NAME_LEN);
         p->name[MAX_NAME_LEN] = '\0';
-    } else {
-        strcpy(p->name, "Игрок");
-    }
+    } else strcpy(p->name, "Игрок");
 
     p->maxHp = 100;
     p->hp = p->maxHp;
