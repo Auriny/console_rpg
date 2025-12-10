@@ -34,22 +34,22 @@ Player* createPlayer(const char *name) {
     return p;
 }
 
+static int xp_required_for(int lvl) {
+    return (int)(50 * lvl * lvl + 50 * lvl);
+}
+
 void lvlUp(Player *p) {
-    int xp = p->xp;
-    int lvl = p->level;
+    int need = xp_required_for(p->level);
 
-    int atk = p->attack;
-    int hp = p->maxHp;
-    int def = p->defense;
-
-    if ((lvl * 100 * 1.25) > xp) {
+    while (p->xp >= need) {
         p->level++;
 
-        p->attack = (int) (atk * 1.25);
-        p->defense = (int) (def * 1.25);
-        p->maxHp += (int) (hp * 1.25);
+        p->attack += 2 + p->level / 2;
+        p->defense += 1 + p->level / 3;
+        p->maxHp += 5 + p->level;
 
-        print("Лвлап");
+        print("Новый уровень!");
+        need = xp_required_for(p->level);
     }
 }
 

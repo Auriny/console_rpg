@@ -82,12 +82,6 @@ void draw_map(const Map *m, int heroX, int heroY) {
     }
 }
 
-int map_is_walkable(const Map *m, int x, int y) {
-    char c = map_get(m, x, y);
-    if (c == '#') return 0;
-    return 1;
-}
-
 void populate_map(Map *m, int depth) {
     if (!m) return;
     for (int y = 1; y < m->height - 1; ++y) {

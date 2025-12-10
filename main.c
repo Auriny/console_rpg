@@ -15,9 +15,6 @@ static void menu(void) {
     print("[3] Тренировочный бой");
     print("[4] Освободить память");
     print("[5] Войти в подземелье");
-    // я бы кнш мог сделать на букву e вход в данж,
-    // но мне бы тогда пришлось переделать всю структуру мейна
-    // а я очень не хочу переделывать всю структуру мейна
 }
 
 static void createOrRecreate(Player **pp) {
@@ -42,7 +39,6 @@ int main(void) {
         size_t choice = readMenuChoice();
 
         switch (choice) {
-            // щас она принимает только инт значения (size_t по факту инт ток побольше)
             case 0:
                 if (playerExists(player)) {
                     print("Чистим память");
