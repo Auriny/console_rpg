@@ -83,7 +83,7 @@ static int roll(int percent) {
 
 static int logatt(Player *attacker, Player *target, int damage, bool dodged, bool attIsPlayer) {
     if (dodged) {
-        print("  >%s уклоняется от атаки %s!", target->name, attacker->name);
+        print("  > %s уклоняется от атаки %s!", target->name, attacker->name);
         if (!attIsPlayer)target->stats.skillUsed++;
         return 0;
     }

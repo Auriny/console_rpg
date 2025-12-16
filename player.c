@@ -25,7 +25,7 @@ Player* createPlayer(const char *name) {
     p->xp = 0;
     p->gold = 0;
 
-    p->dodge = 5;
+    p->dodge = 35;
 
     p->bonusAttack = 0;
 
@@ -87,15 +87,15 @@ void printStatistics(const Player *p) {
     print("=== СТАТИСТИКА ===");
     print("Шагов пройдено: %lld", s->steps);
     print("Аптечек собрано: %d", s->medkitsCollected);
-    print("Сущностей (костров) собрано: %d", s->entitiesCollected);
+    print("Костров собрано: %d", s->entitiesCollected);
     print("Врагов убито: %d", s->enemiesKilled);
     print("Макс. этаж: %d", s->maxFloor);
     print("Макс. урон (нанесен): %d", s->maxDmgDealt);
     print("Макс. урон (получен): %d", s->maxDmgTaken);
     if (s->bestFloorTime > 900000.0) {
         print("Рекорд этажа: нет данных");
-    } else print("Рекорд этажа: %.2f сек", s->bestFloorTime);
-    print("Общее время игры: %.2f сек", s->totalPlayTime);
+    } else print("Рекорд этажа: %d сек", s->bestFloorTime);
+    print("Общее время игры: %d сек", s->totalPlayTime);
     print("Успешных уклонений: %d", s->skillUsed);
     print("================");
 }
