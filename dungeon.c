@@ -206,9 +206,9 @@ void enter_dungeon(Player **ppPlayer) {
 
                 time_t endTime = time(NULL);
                 double floorTime = difftime(endTime, floorStartTime);
-                player->stats.totalPlayTime += floorTime;
-                if (floorTime < player->stats.bestFloorTime) {
-                    player->stats.bestFloorTime = floorTime;
+                player->stats.totalPlayTime += (unsigned long)floorTime;
+                if (player->stats.bestFloorTime == 0 || floorTime < (double)player->stats.bestFloorTime) {
+                    player->stats.bestFloorTime = (unsigned long)floorTime;
                 }
 
                 free_map(&map);
@@ -232,9 +232,9 @@ void enter_dungeon(Player **ppPlayer) {
             } else if (cell == 'U') {
                 time_t endTime = time(NULL);
                 double floorTime = difftime(endTime, floorStartTime);
-                player->stats.totalPlayTime += floorTime;
-                if (floorTime < player->stats.bestFloorTime) {
-                    player->stats.bestFloorTime = floorTime;
+                player->stats.totalPlayTime += (unsigned long)floorTime;
+                if (player->stats.bestFloorTime == 0 || floorTime < (double)player->stats.bestFloorTime) {
+                    player->stats.bestFloorTime = (unsigned long)floorTime;
                 }
 
                 print("Выход наверх найден. Конец похода.");
