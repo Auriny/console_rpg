@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define SAVE_FILENAME "save.txt"
+
 void print(const char *format, ...);
 
 void illst(void);

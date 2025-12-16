@@ -1,6 +1,7 @@
 #include "dungeon.h"
 #include "utils.h"
 #include "battle.h"
+#include <time.h>
 
 static void place_hero_random(Map *m, int *hx, int *hy) {
     for (int tries = 0; tries < 1000; ++tries) {
@@ -17,16 +18,16 @@ static void place_hero_random(Map *m, int *hx, int *hy) {
     *hy = 1;
 }
 
-/* обработка взаимодействия с текущей клеткой */
-static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int *heroX, int *heroY) {
+static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int *heroX, int *heroY, bool isLava) {
     if (! ppPlayer || !*ppPlayer) return false;
     Player *player = *ppPlayer;
+
+    player->stats.steps++;
+
     char c = map_get(m, x, y);
     switch (c) {
         case '#': // стена
             return false;
-//        case '\xFE':
-//            return false;
         case 'X': //ход
             *heroX = x; *heroY = y;
             return true;
@@ -34,6 +35,9 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
             player->hp += 20;
             if (player->hp > player->maxHp) player->hp = player->maxHp;
             print("Подобрана аптечка: +20 HP (теперь %d/%d)", player->hp, player->maxHp);
+
+            player->stats.medkitsCollected++;
+
             map_set(m, x, y, 'X');
             *heroX = x; *heroY = y;
             return true;
@@ -42,6 +46,9 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
             if (player->hp > player->maxHp) player->hp = player->maxHp;
             player->bonusAttack += CAMP_BONUS;
             print("Костёр: восстановлено %d HP, баф +%d к атаке на следующий бой.", CAMP_HEAL, CAMP_BONUS);
+
+            player->stats.entitiesCollected++;
+
             map_set(m, x, y, 'X');
             *heroX = x; *heroY = y;
             return true;
@@ -49,6 +56,7 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
         case 'D': { //спуск на уровень ниже
             print("Спускаемся вниз...");
             (*depth)++;
+            if (*depth > player->stats.maxFloor) player->stats.maxFloor = *depth;
             return false;
         }
         case 'U': { // лестница вверх
@@ -58,16 +66,26 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
         }
         case 'M': { //монстрик
             print("Монстр нападает!");
+            if (isLava) print("! АКТИВНА ЛАВА: НАГРАДЫ УДВОЕНЫ !");
+
             Player *enemy = createEnemy(*depth);
             if (!enemy) {
                 print("Не удалось создать врага, продолжаем.");
                 return false;
             }
             print("Бой: %s (Вы) vs %s (Монстр)", player->name, enemy->name);
+
             BattleResult res = battle(player, enemy);
+
             if (res == WIN) {
                 int xp = enemy->xp;
                 int gold = enemy->gold;
+
+                if (isLava) {
+                    xp *= 2;
+                    gold *= 2;
+                }
+
                 player->xp += xp;
                 player->gold += gold;
                 print("Вы победили: +%d XP, +%d золота.", xp, gold);
@@ -75,10 +93,10 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
                 *heroX = x; *heroY = y;
                 freeEnemy(&enemy);
                 return true;
-            } else { //смэрть
-                print("Вы пали в бою.. .");
+            } else {
+                print("Вы пали в бою. . . ");
                 if (player->xp >= 10) {
-                    print("Хотите воскреснуть? (требует опыта и голды)");
+                    print("Хотите воскреснуть? (требует немного опыта и голды)");
                     print("[1] Да  [2] Нет");
                     size_t ch = readMenuChoice();
                     if (ch == 1) {
@@ -94,7 +112,7 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
                     }
                 }
                 freeEnemy(&enemy);
-                print("Вы пали в бою. Удаляем персонажа.");
+                print("Смэрть в нищите. Удаляем персонажа.");
                 freePlayer(ppPlayer);
                 return false;
             }
@@ -113,6 +131,7 @@ void enter_dungeon(Player **ppPlayer) {
 
     Player *player = *ppPlayer;
     int depth = 1;
+    if (depth > player->stats.maxFloor) player->stats.maxFloor = depth;
 
     Map *map = create_map(DUNGEON_MAP_W, DUNGEON_MAP_H);
     if (!map) {
@@ -124,17 +143,36 @@ void enter_dungeon(Player **ppPlayer) {
     int heroX = 1, heroY = 1;
     place_hero_random(map, &heroX, &heroY);
 
+    bool isLava = (random(1, 100) <= LAVA_CHANCE_PERCENT);
+    time_t floorStartTime = time(NULL);
+
+    if (isLava) {
+        print("!!! ПОЛ ЭТО ЛАВА !!!");
+        print("У вас есть %d секунд, чтобы покинуть этаж (найти U или D).", LAVA_TIME_LIMIT_SEC);
+        print("Награды за монстров удвоены, но если время выйдет - вы умрете.");
+    }
+
     bool running = true;
     while (running && playerExists(player)) {
+        time_t currentTime = time(NULL);
+        if (isLava) {
+            double elapsed = difftime(currentTime, floorStartTime);
+            if (elapsed > LAVA_TIME_LIMIT_SEC) {
+                print("Вы сгорели");
+                free_map(&map);
+                freePlayer(ppPlayer); // Смерть
+                return;
+            }
+        }
+
         print("-===- Подземелье: уровень %d -===-", depth);
         draw_map(map, heroX, heroY);
         print("[W] Вверх  [S] Вниз  [A] Влево  [D] Вправо  [P] Статы  [Q] Выход из подземелья");
 
-        int key;
-        do { // тут был какой-то очень смешной баг ->
+        int key = 0;
+        while (key == 0 || key == '\n' || key == '\r') {
             key = readKey();
-            // без этого while v энтер тоже считался за символ
-        } while (key == 0 || key == '\n' || key == '\r');
+        }
 
         if (key == KEY_P) {
             printPlayerInfo(player);
@@ -157,7 +195,7 @@ void enter_dungeon(Player **ppPlayer) {
             continue;
         }
 
-        bool movedOrHandled = handle_cell(ppPlayer, map, nx, ny, &depth, &heroX, &heroY);
+        bool movedOrHandled = handle_cell(ppPlayer, map, nx, ny, &depth, &heroX, &heroY, isLava);
 
         if (!playerExists(*ppPlayer)) {
             print("Персонаж удалён, выходим из подземелья.");
@@ -168,6 +206,14 @@ void enter_dungeon(Player **ppPlayer) {
         if (!movedOrHandled) {
             char cell = map_get(map, nx, ny);
             if (cell == 'D') {
+
+                time_t endTime = time(NULL);
+                double floorTime = difftime(endTime, floorStartTime);
+                player->stats.totalPlayTime += floorTime;
+                if (floorTime < player->stats.bestFloorTime) {
+                    player->stats.bestFloorTime = floorTime;
+                }
+
                 free_map(&map);
                 map = create_map(DUNGEON_MAP_W, DUNGEON_MAP_H);
                 if (! map) {
@@ -178,8 +224,23 @@ void enter_dungeon(Player **ppPlayer) {
                 populate_map(map, depth);
                 place_hero_random(map, &heroX, &heroY);
                 print("Новый уровень: %d", depth);
+
+                isLava = (random(1, 100) <= LAVA_CHANCE_PERCENT);
+                floorStartTime = time(NULL);
+                if (isLava) {
+                    print("!!! ПОЛ ЭТО ЛАВА !!!");
+                    print("Бегите! %d секунд!", LAVA_TIME_LIMIT_SEC);
+                }
+
                 continue;
             } else if (cell == 'U') {
+                time_t endTime = time(NULL);
+                double floorTime = difftime(endTime, floorStartTime);
+                player->stats.totalPlayTime += floorTime;
+                if (floorTime < player->stats.bestFloorTime) {
+                    player->stats.bestFloorTime = floorTime;
+                }
+
                 print("Выход наверх найден. Конец похода.");
                 running = false;
                 break;
@@ -190,5 +251,7 @@ void enter_dungeon(Player **ppPlayer) {
     }
 
     free_map(&map);
-    print("Вы вышли из подземелья! Итог: уровень %d, опыт %d, голдп %d", player->level, player->xp, player->gold);
+    if (playerExists(player)) {
+        print("Вы вышли из подземелья! Итог: уровень %d, опыт %d, голдп %d", player->level, player->xp, player->gold);
+    }
 }

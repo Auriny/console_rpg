@@ -32,7 +32,6 @@ Player* createEnemy(int depth) {
     e->attack = 10 * e->level;
     e->defense = 5 * e->level;
 
-    // множители для уровней
     const double HP_PER_DEPTH = 0.25;
     const double ATTACK_PER_DEPTH = 0.20;
     const double DEF_PER_DEPTH = 0.15;
@@ -82,12 +81,18 @@ static int roll(int percent) {
     return rollv <= percent;
 }
 
-static void logatt(const Player *att, const Player *def, int dmg, bool dodged) {
+static int logatt(Player *attacker, Player *target, int damage, bool dodged, bool attIsPlayer) {
     if (dodged) {
-        print("  >%s уклоняется от атаки %s!", def->name, att->name);
-        return;
+        print("  >%s уклоняется от атаки %s!", target->name, attacker->name);
+        if (!attIsPlayer)target->stats.skillUsed++;
+        return 0;
     }
-    print("  >%s бьёт %s на %d урона.", att->name, def->name, dmg);
+    print("  > %s наносит удар %s на %d урона.", attacker->name, target->name, damage);
+
+    if (attIsPlayer) {
+        if (damage > attacker->stats.maxDmgDealt) attacker->stats.maxDmgDealt = damage;
+    } else if (damage > target->stats.maxDmgTaken) target->stats.maxDmgTaken = damage;
+    return damage;
 }
 
 BattleResult battle(Player *player, Player *enemy) {
@@ -106,7 +111,8 @@ BattleResult battle(Player *player, Player *enemy) {
             enemy->hp -= dmg;
             if (enemy->hp < 0) enemy->hp = 0;
         }
-        logatt(player, enemy, dmg, dodged);
+        logatt(player, enemy, dmg, dodged, true);
+
         print("%s: %d/%d HP | %s: %d/%d HP", player->name, player->hp, player->maxHp, enemy->name, enemy->hp, enemy->maxHp);
         sleep(TURN_DELAY_MS);
         if (!playerBonusConsumed && player->bonusAttack != 0) {
@@ -123,7 +129,8 @@ BattleResult battle(Player *player, Player *enemy) {
             player->hp -= dmg;
             if (player->hp < 0) player->hp = 0;
         }
-        logatt(enemy, player, dmg, dodged);
+        logatt(enemy, player, dmg, dodged, false);
+
         print("%s: %d/%d HP | %s: %d/%d HP", player->name, player->hp, player->maxHp, enemy->name, enemy->hp, enemy->maxHp);
         sleep(TURN_DELAY_MS);
 
@@ -135,7 +142,10 @@ BattleResult battle(Player *player, Player *enemy) {
         step++;
     }
 
-    lvlUp(player);
+    if (player->hp > 0) {
+        lvlUp(player);
+        player->stats.enemiesKilled++;
+    }
     return player->hp > 0 ? WIN : DEAD;
 }
 
@@ -143,6 +153,7 @@ static void win(Player *player, const Player *enemy) {
     print("Противник %s умэр. Победа!", enemy->name);
     int xp = enemy->xp;
     int gold = enemy->gold;
+
     player->xp += xp;
     player->gold += gold;
     print("Награда: +%d опыта, +%d голды.", xp, gold);
