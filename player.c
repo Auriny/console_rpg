@@ -30,7 +30,7 @@ Player* createPlayer(const char *name) {
     p->bonusAttack = 0;
 
     memset(&p->stats, 0, sizeof(p->stats));
-    p->stats.bestFloorTime = 9999999.0; //костыль? не знаю
+    p->stats.bestFloorTime = 9999999; //костыль? не знаю
 
     print("Структура игрока создана по адресу %p", (void*)p);
     return p;
