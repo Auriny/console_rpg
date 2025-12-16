@@ -51,7 +51,7 @@ void free_map(Map **m) {
 }
 
 char map_get(const Map *m, int x, int y) {
-    if (! m) return 0;
+    if (!m) return 0;
     if (x < 0 || y < 0 || x >= m->width || y >= m->height) return '#';
     return m->data[y * m->width + x];
 }

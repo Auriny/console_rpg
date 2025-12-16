@@ -84,37 +84,6 @@ void readStrLtd(const char *prompt, char *buffer, size_t maxLen) {
     }
 }
 
-int readIntRange(const char *prompt, int min, int max) {
-    char line[256];
-    for (;;) {
-        if (prompt && *prompt) print("%s", prompt);
-        if (!readLine(line, sizeof(line))) {
-            print("Ошибка ввода, попробуйте снова");
-            continue;
-        }
-        if (line[0] == '\0') {
-            continue;
-        }
-        char *p = line;
-        if (*p == '+' || *p == '-') p++;
-        bool ok = *p != '\0';
-        while (*p && ok) {
-            if (!isdigit((unsigned char)*p)) ok = false;
-            p++;
-        }
-        if (!ok) {
-            print("Ожидается целое число, повторите ввод");
-            continue;
-        }
-        const int v = (int) strtol(line, NULL, 10);
-        if (v < min || v > max) {
-            print("Число вне диапазона [%d..%d], попробуйте снова", min, max);
-            continue;
-        }
-        return v;
-    }
-}
-
 int random(int min, int max) {
     if (max < min) {
         int t = min;

@@ -113,7 +113,7 @@ bool savePlayer(const Player *p) {
             p->level, p->xp, p->gold, p->dodge);
 
     const Statistics *s = &p->stats;
-    fprintf(f, "%lld %d %d %d %d %d %d %.2f %.2f %d\n",
+    fprintf(f, "%lld %d %d %d %d %d %d %.2lu %.2lu %d\n",
             s->steps, s->medkitsCollected, s->entitiesCollected,
             s->enemiesKilled, s->maxFloor, s->maxDmgDealt,
             s->maxDmgTaken, s->bestFloorTime, s->totalPlayTime,
@@ -158,14 +158,14 @@ Player* loadPlayer() {
 
     p->bonusAttack = 0;
 
-    if (fscanf(f, "%lld %d %d %d %d %d %d %lf %lf %d",
+    if (fscanf(f, "%lld %d %d %d %d %d %d %lu %lu %d",
                &p->stats.steps, &p->stats.medkitsCollected, &p->stats.entitiesCollected,
                &p->stats.enemiesKilled, &p->stats.maxFloor, &p->stats.maxDmgDealt,
                &p->stats.maxDmgTaken, &p->stats.bestFloorTime, &p->stats.totalPlayTime,
                &p->stats.skillUsed) != 10) {
         print("Статистика не прочитана или повреждена, сброс");
         memset(&p->stats, 0, sizeof(p->stats));
-        p->stats.bestFloorTime = 999999.0;
+        p->stats.bestFloorTime = 999999;
     }
 
     fclose(f);

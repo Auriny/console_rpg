@@ -77,8 +77,7 @@ static int baseDamage(const Player *att, const Player *def) {
 static int roll(int percent) {
     if (percent <= 0) return 0;
     if (percent >= 100) return 1;
-    int rollv = random(1, 100);
-    return rollv <= percent;
+    return random(1, 100) <= percent;
 }
 
 static int logatt(Player *attacker, Player *target, int damage, bool dodged, bool attIsPlayer) {
@@ -166,7 +165,7 @@ static bool canResurrect(const Player *p) {
 
 static bool tryResurrect(Player *p) {
     if (!canResurrect(p)) {
-        print("Воскрешение невозможн! У вас недостаточно опыта (надо минимум 10)");
+        print("Воскрешение невозможно! У вас недостаточно опыта (надо минимум 10)");
         return false;
     }
     int xpCost = p->xp / 10; // 10%
@@ -178,7 +177,7 @@ static bool tryResurrect(Player *p) {
     print("[1] Да  [2] Нет");
     size_t ch = readMenuChoice();
     if (ch == 1) {
-        p->xp   -= xpCost;
+        p->xp -= xpCost;
         p->gold -= goldCost;
         p->hp = p->maxHp;
         print("Воскресье! Текущий опыт: %d, голды: %d", p->xp, p->gold);
