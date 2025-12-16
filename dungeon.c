@@ -147,20 +147,18 @@ void enter_dungeon(Player **ppPlayer) {
     time_t floorStartTime = time(NULL);
 
     if (isLava) {
-        print("!!! ПОЛ ЭТО ЛАВА !!!");
-        print("У вас есть %d секунд, чтобы покинуть этаж (найти U или D).", LAVA_TIME_LIMIT_SEC);
-        print("Награды за монстров удвоены, но если время выйдет - вы умрете.");
+        print("~!!!~ ПОЛ ЭТО ЛАВА ~!!!~");
+        print("У вас есть %d секунд, чтобы покинуть этаж (найти U или D)!!!", LAVA_TIME_LIMIT_SEC);
     }
 
-    bool running = true;
-    while (running && playerExists(player)) {
+    while (playerExists(player)) {
         time_t currentTime = time(NULL);
         if (isLava) {
             double elapsed = difftime(currentTime, floorStartTime);
             if (elapsed > LAVA_TIME_LIMIT_SEC) {
-                print("Вы сгорели");
+                print("Вы сгорели :(");
                 free_map(&map);
-                freePlayer(ppPlayer); // Смерть
+                freePlayer(ppPlayer);
                 return;
             }
         }
@@ -199,7 +197,6 @@ void enter_dungeon(Player **ppPlayer) {
 
         if (!playerExists(*ppPlayer)) {
             print("Персонаж удалён, выходим из подземелья.");
-            running = false;
             break;
         }
 
@@ -216,9 +213,8 @@ void enter_dungeon(Player **ppPlayer) {
 
                 free_map(&map);
                 map = create_map(DUNGEON_MAP_W, DUNGEON_MAP_H);
-                if (! map) {
+                if (!map) {
                     print("Не удалось создать следующий уровень.");
-                    running = false;
                     break;
                 }
                 populate_map(map, depth);
@@ -242,7 +238,6 @@ void enter_dungeon(Player **ppPlayer) {
                 }
 
                 print("Выход наверх найден. Конец похода.");
-                running = false;
                 break;
             } else {
                 continue;
