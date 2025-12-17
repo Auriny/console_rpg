@@ -93,29 +93,29 @@ static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int
                 *heroX = x; *heroY = y;
                 freeEnemy(&enemy);
                 return true;
-            } else {
-                print("Вы пали в бою. . . ");
-                if (player->xp >= 10) {
-                    print("Хотите воскреснуть? (требует немного опыта и голды)");
-                    print("[1] Да  [2] Нет");
-                    size_t ch = readMenuChoice();
-                    if (ch == 1) {
-                        int xpCost = player->xp / 10;
-                        if (xpCost < 10) xpCost = 10;
-                        int goldCost = (player->gold >= 10) ? (player->gold / 2) : player->gold;
-                        player->xp -= xpCost;
-                        player->gold -= goldCost;
-                        player->hp = player->maxHp;
-                        print("Воскресье! %d XP и %d голды потрачено.", xpCost, goldCost);
-                        freeEnemy(&enemy);
-                        return true;
-                    }
-                }
-                freeEnemy(&enemy);
-                print("Смэрть в нищите. Удаляем персонажа.");
-                freePlayer(ppPlayer);
-                return false;
             }
+
+            print("Вы пали в бою. . . ");
+            if (player->xp >= 10) {
+                print("Хотите воскреснуть? (требует немного опыта и голды)");
+                print("[1] Да  [2] Нет");
+                size_t ch = readMenuChoice();
+                if (ch == 1) {
+                    int xpCost = player->xp / 10;
+                    if (xpCost < 10) xpCost = 10;
+                    int goldCost = (player->gold >= 10) ? (player->gold / 2) : player->gold;
+                    player->xp -= xpCost;
+                    player->gold -= goldCost;
+                    player->hp = player->maxHp;
+                    print("Воскресье! %d XP и %d голды потрачено.", xpCost, goldCost);
+                    freeEnemy(&enemy);
+                    return true;
+                }
+            }
+            freeEnemy(&enemy);
+            print("Смэрть в нищите. Удаляем персонажа.");
+            freePlayer(ppPlayer);
+            return false;
         }
         default:
             *heroX = x; *heroY = y;
@@ -227,8 +227,6 @@ void enter_dungeon(Player **ppPlayer) {
                     print("!!! ПОЛ ЭТО ЛАВА !!!");
                     print("Бегите! %d секунд!", LAVA_TIME_LIMIT_SEC);
                 }
-
-                continue;
             } else if (cell == 'U') {
                 time_t endTime = time(NULL);
                 double floorTime = difftime(endTime, floorStartTime);
@@ -239,8 +237,6 @@ void enter_dungeon(Player **ppPlayer) {
 
                 print("Выход наверх найден. Конец похода.");
                 break;
-            } else {
-                continue;
             }
         }
     }

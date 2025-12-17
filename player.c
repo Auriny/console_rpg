@@ -124,8 +124,8 @@ bool savePlayer(const Player *p) {
     return true;
 }
 
-Player* loadPlayer() {
-    FILE *f = fopen(SAVE_FILENAME, "r");
+Player* loadPlayer(const char* fileName) {
+    FILE *f = fileName == NULL ? fopen(SAVE_FILENAME, "r") : fopen(fileName, "r");
     if (!f) {
         print("Файл сохранения не найден!");
         return NULL;
@@ -151,7 +151,8 @@ Player* loadPlayer() {
 
     if (fscanf(f, "%d %d %d %d %d %d %d %d",
                &p->maxHp, &p->hp, &p->attack, &p->defense,
-               &p->level, &p->xp, &p->gold, &p->dodge) != 8) {
+               &p->level, &p->xp, &p->gold, &p->dodge) !
+               = 8) {
         print("Ошибка чтения характеристик персонажа!");
         free(p); fclose(f); return NULL;
     }

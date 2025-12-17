@@ -30,14 +30,16 @@ static void createOrRecreate(Player **pp) {
     print("Персонаж '%s' создан", (*pp)->name);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     srand((unsigned) time(NULL));
     setlocale(LC_ALL, "Rus");
 
     Player *player = NULL;
 
-//    Player *loaded = loadPlayer();
-//    if (loaded) player = loaded;
+    if (argc > 1) {
+        Player *loaded = loadPlayer(argv[1]);
+        if (loaded) player = loaded;
+    }
 
     while (true) {
         menu();
@@ -83,7 +85,7 @@ int main() {
                     if (readMenuChoice() != 1) break;
                     freePlayer(&player);
                 }
-                Player *loaded = loadPlayer();
+                Player *loaded = loadPlayer(argv[1]);
                 if (loaded) player = loaded;
                 break;
             case 8:

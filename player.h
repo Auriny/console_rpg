@@ -45,9 +45,9 @@ void printStatistics(const Player *p);
 void lvlUp(Player *p);
 
 bool savePlayer(const Player *p);
-Player* loadPlayer();
+Player* loadPlayer(const char* fileName);
 
-static inline bool playerExists(const Player *p) {
+static bool playerExists(const Player *p) {
     return p != NULL;
 }
 
