@@ -151,8 +151,7 @@ Player* loadPlayer(const char* fileName) {
 
     if (fscanf(f, "%d %d %d %d %d %d %d %d",
                &p->maxHp, &p->hp, &p->attack, &p->defense,
-               &p->level, &p->xp, &p->gold, &p->dodge) !
-               = 8) {
+               &p->level, &p->xp, &p->gold, &p->dodge) != 8) {
         print("Ошибка чтения характеристик персонажа!");
         free(p); fclose(f); return NULL;
     }
