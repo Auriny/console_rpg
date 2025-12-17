@@ -19,7 +19,7 @@ void print(const char *format, ...) {
     MultiByteToWideChar(CP_UTF8, 0, buffer, -1, wbuffer, 1024);
 
     DWORD written;
-    WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), wbuffer, (DWORD)wcslen(wbuffer), &written, NULL);
+    WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), wbuffer, wcslen(wbuffer), &written, NULL);
     WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), L"\n", 1, &written, NULL);
 }
 
