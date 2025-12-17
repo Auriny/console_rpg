@@ -53,7 +53,7 @@ size_t readMenuChoice() {
             continue;
         }
         char *endptr = NULL;
-        unsigned long v = strtoul(line, &endptr, 10);
+        const unsigned long v = strtoul(line, &endptr, 10);
         if (!endptr || *endptr != '\0') {
             print("Ожидается целое число, повторите ввод.");
             continue;
@@ -70,7 +70,7 @@ void readStrLtd(const char *prompt, char *buffer, size_t maxLen) {
             print("Ошибка ввода, попробуйте снова");
             continue;
         }
-        size_t len = strlen(line);
+        const size_t len = strlen(line);
         if (len == 0) {
             print("Строка не должна быть пустой, повторите ввод");
             continue;
@@ -90,8 +90,8 @@ int random(int min, int max) {
         min = max;
         max = t;
     }
-    int span = max - min + 1;
-    return min + (rand() % span);
+    const int span = max - min + 1;
+    return min + rand() % span;
 }
 
 void sleep(unsigned int ms) {

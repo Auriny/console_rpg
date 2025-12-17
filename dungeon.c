@@ -5,8 +5,8 @@
 
 static void place_hero_random(Map *m, int *hx, int *hy) {
     for (int tries = 0; tries < 1000; ++tries) {
-        int x = random(1, m->width - 2);
-        int y = random(1, m->height - 2);
+        const int x = random(1, m->width - 2);
+        const int y = random(1, m->height - 2);
         if (map_get(m, x, y) == 'X') {
             *hx = x;
             *hy = y;
@@ -19,7 +19,7 @@ static void place_hero_random(Map *m, int *hx, int *hy) {
 }
 
 static bool handle_cell(Player **ppPlayer, Map *m, int x, int y, int *depth, int *heroX, int *heroY, bool isLava) {
-    if (! ppPlayer || !*ppPlayer) return false;
+    if (!ppPlayer || !*ppPlayer) return false;
     Player *player = *ppPlayer;
 
     player->stats.steps++;
@@ -205,10 +205,10 @@ void enter_dungeon(Player **ppPlayer) {
             if (cell == 'D') {
 
                 time_t endTime = time(NULL);
-                double floorTime = difftime(endTime, floorStartTime);
-                player->stats.totalPlayTime += (unsigned long)floorTime;
-                if (player->stats.bestFloorTime == 0 || floorTime < (double)player->stats.bestFloorTime) {
-                    player->stats.bestFloorTime = (unsigned long)floorTime;
+                unsigned long floorTime = (unsigned long) difftime(endTime, floorStartTime);
+                player->stats.totalPlayTime += floorTime;
+                if (player->stats.bestFloorTime == 0 || floorTime < player->stats.bestFloorTime) {
+                    player->stats.bestFloorTime = floorTime;
                 }
 
                 free_map(&map);
@@ -225,17 +225,17 @@ void enter_dungeon(Player **ppPlayer) {
                 floorStartTime = time(NULL);
                 if (isLava) {
                     print("!!! ПОЛ ЭТО ЛАВА !!!");
-                    print("Бегите! %d секунд!", LAVA_TIME_LIMIT_SEC);
+                    print("Бегите! Осталось %d секунд!", LAVA_TIME_LIMIT_SEC);
                 }
             } else if (cell == 'U') {
                 time_t endTime = time(NULL);
-                double floorTime = difftime(endTime, floorStartTime);
-                player->stats.totalPlayTime += (unsigned long)floorTime;
-                if (player->stats.bestFloorTime == 0 || floorTime < (double)player->stats.bestFloorTime) {
-                    player->stats.bestFloorTime = (unsigned long)floorTime;
+                unsigned long floorTime = (unsigned long) difftime(endTime, floorStartTime);
+                player->stats.totalPlayTime += floorTime;
+                if (player->stats.bestFloorTime == 0 || floorTime < player->stats.bestFloorTime) {
+                    player->stats.bestFloorTime = floorTime;
                 }
 
-                print("Выход наверх найден. Конец похода.");
+                print("Конец похода в данж!");
                 break;
             }
         }

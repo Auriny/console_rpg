@@ -17,7 +17,7 @@
 #define CAMP_HEAL 20
 #define CAMP_BONUS 5
 
-#define LAVA_CHANCE_PERCENT 20
+#define LAVA_CHANCE_PERCENT 100
 #define LAVA_TIME_LIMIT_SEC 30
 
 void enter_dungeon(Player **ppPlayer);
